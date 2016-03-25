@@ -8,9 +8,11 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import ru.grushetsky.itk.model.AudioDir;
-import ru.grushetsky.itk.model.Session;
-import ru.grushetsky.itk.view.AudioDirListController;
+import ru.grushetsky.itk.config.SessionManager;
+import ru.grushetsky.itk.diskops.AudioDir;
+import ru.grushetsky.itk.config.Session;
+import ru.grushetsky.itk.config.Settings;
+import ru.grushetsky.itk.view.SessionController;
 
 import java.io.IOException;
 
@@ -36,24 +38,26 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        this.primaryStage.setTitle("AddressApp");
+        this.primaryStage.setTitle("ITunesKiller");
 
         initRootLayout();
 
-        initSession();
+        Settings currentSettings = Settings.getInstance();
 
-        showAudioDirData();
+        SessionManager sessionManager = SessionManager.getInstance();
+        Session session = sessionManager.getSession(currentSettings.getLastSessionId());
+
+        initSession(session);
+
+        showSessionPane();
     }
 
-    /**
-     * Initializes the root layout.
-     */
     public void initRootLayout() {
         try {
             // Load root layout from fxml file.
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("view/RootLayout.fxml"));
-            rootLayout = (BorderPane) loader.load();
+            rootLayout = FXMLLoader.load(getClass().getResource("view/RootLayout.fxml"));
+
+            // TODO Init global config
 
             // Show the scene containing the root layout.
             Scene scene = new Scene(rootLayout);
@@ -64,10 +68,7 @@ public class MainApp extends Application {
         }
     }
 
-    public void initSession() {
-
-        SessionManager sessionManager = new SessionManager("session.json");
-        Session session = sessionManager.getSession();
+    public void initSession(Session session) {
         this.sources.setAll(session.getSources());
 
 //        for (AudioDir source:this.session.getSources()){
@@ -82,31 +83,24 @@ public class MainApp extends Application {
 
     }
 
-    /**
-     * Shows the person overview inside the root layout.
-     */
-    public void showAudioDirData() {
+
+    public void showSessionPane() {
         try {
-            // Load person overview.
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("view/SessionView.fxml"));
-            AnchorPane audioDirData = (AnchorPane) loader.load();
+            AnchorPane sessionPane = loader.load();
 
-            // Set person overview into the center of root layout.
-            rootLayout.setCenter(audioDirData);
+            rootLayout.setCenter(sessionPane);
 
-            AudioDirListController controller = loader.getController();
+            SessionController controller = loader.getController();
             controller.setMainApp(this);
+            controller.initTabs();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Returns the main stage.
-     * @return
-     */
     public Stage getPrimaryStage() {
         return primaryStage;
     }

@@ -1,4 +1,6 @@
-package ru.grushetsky.itk.model;
+package ru.grushetsky.itk.config;
+
+import ru.grushetsky.itk.diskops.AudioDir;
 
 public class Session {
     private AudioDir[] sources;

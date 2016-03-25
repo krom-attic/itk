@@ -1,21 +1,22 @@
-package ru.grushetsky.itk.model;
+package ru.grushetsky.itk.diskops;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import ru.grushetsky.itk.FS;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-public class AudioDir {
-    private ObjectProperty<File> basedir;
+public class AudioDir implements IDirLister {
+    private ObjectProperty<Path> basedir;
     private ObjectProperty<FS> fs;
 
     public AudioDir(String path) throws Exception {
-        this.basedir = new SimpleObjectProperty<File>(new File(path));
-        this.fs = new SimpleObjectProperty<FS>(new FS(this.basedir.getValue()));
+        this.basedir = new SimpleObjectProperty<>(Paths.get(path));
+        this.fs = new SimpleObjectProperty<>(new FS(this.basedir.getValue()));
     }
 
-    public File getBasedir() {
+    public Path getBasedir() {
         return this.basedir.get();
     }
 
@@ -33,6 +34,10 @@ public class AudioDir {
 
     public String toString() {
         return "AudioDir object with path: " + this.basedir.toString();
+    }
+
+    public String getShortName() {
+        return getBasedir().getFileName().toString();
     }
 
     public void print() {
