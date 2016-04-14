@@ -1,17 +1,15 @@
 package ru.grushetsky.itk;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import ru.grushetsky.itk.config.SessionManager;
-import ru.grushetsky.itk.diskops.AudioDir;
-import ru.grushetsky.itk.config.Session;
+import ru.grushetsky.itk.config.SessionConfig;
 import ru.grushetsky.itk.config.Settings;
+import ru.grushetsky.itk.main.Session;
 import ru.grushetsky.itk.view.SessionController;
 
 import java.io.IOException;
@@ -20,19 +18,11 @@ public class MainApp extends Application {
 
     private Stage primaryStage;
     private BorderPane rootLayout;
-    private ObservableList<AudioDir> sources = FXCollections.observableArrayList();
-    private ObservableList<AudioDir> destinations = FXCollections.observableArrayList();
+    private Session currentSession;
+    private Settings currentSettings;
 
     public MainApp() {
 
-    }
-
-    public ObservableList<AudioDir> getSources() {
-        return this.sources;
-    }
-
-    public ObservableList<AudioDir> getDestinations() {
-        return this.destinations;
     }
 
     @Override
@@ -42,12 +32,11 @@ public class MainApp extends Application {
 
         initRootLayout();
 
-        Settings currentSettings = Settings.getInstance();
+        currentSettings = Settings.getInstance();
 
         SessionManager sessionManager = SessionManager.getInstance();
-        Session session = sessionManager.getSession(currentSettings.getLastSessionId());
-
-        initSession(session);
+        SessionConfig sessionConfig = sessionManager.getSessionConfig(currentSettings.getLastSessionId());
+        currentSession = new Session(this, sessionConfig);
 
         showSessionPane();
     }
@@ -57,8 +46,6 @@ public class MainApp extends Application {
             // Load root layout from fxml file.
             rootLayout = FXMLLoader.load(getClass().getResource("view/RootLayout.fxml"));
 
-            // TODO Init global config
-
             // Show the scene containing the root layout.
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
@@ -67,22 +54,6 @@ public class MainApp extends Application {
             e.printStackTrace();
         }
     }
-
-    public void initSession(Session session) {
-        this.sources.setAll(session.getSources());
-
-//        for (AudioDir source:this.session.getSources()){
-//            source.print();
-//
-//            File[] dirs = source.getFs().listDir();
-//            for (File dir:dirs) {
-//                System.out.print(dir.toString() + "\n");
-//            }
-//
-//        }
-
-    }
-
 
     public void showSessionPane() {
         try {
@@ -109,4 +80,11 @@ public class MainApp extends Application {
         launch(args);
     }
 
+    public Session getCurrentSession() {
+        return currentSession;
+    }
+
+    public Settings getCurrentSettings() {
+        return currentSettings;
+    }
 }

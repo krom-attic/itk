@@ -2,11 +2,12 @@ package ru.grushetsky.itk.config;
 
 import ru.grushetsky.itk.io.ISessionProvider;
 import ru.grushetsky.itk.io.SessionJsonFileProvider;
+import ru.grushetsky.itk.main.Session;
 
 import java.util.HashMap;
 
 public class SessionManager {
-    ISessionProvider sessionRW;
+    ???? sessionReader;
 
     private static SessionManager outInstance = new SessionManager();
 
@@ -17,7 +18,7 @@ public class SessionManager {
     }
 
     private SessionManager() {
-        sessionRW = new SessionJsonFileProvider();
+
     }
 
     public void createSession() {
@@ -28,10 +29,11 @@ public class SessionManager {
         if (sessions.containsKey(sessionId)) {
             return sessions.get(sessionId);
         } else {
-            // TODO What if stored session doesn't exist?
-            Session session = sessionRW.readSession(sessionId);
-            sessions.put(sessionId, session);
-            return session;
+            // TODO What if stored sessionConfig doesn't exist?
+
+            Session session = sessionReader.?????(sessionId);
+            sessions.put(sessionId, Session);
+            return sessionConfig;
         }
     }
 

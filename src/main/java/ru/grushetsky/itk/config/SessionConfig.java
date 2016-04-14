@@ -2,11 +2,10 @@ package ru.grushetsky.itk.config;
 
 import ru.grushetsky.itk.diskops.AudioDir;
 
-public class Session {
-    private AudioDir[] sources;
+public class SessionConfig {
     private AudioDir[] destinations;
 
-    public Session() {}
+    public SessionConfig() {}
 
     public void setDestinations(String[] destinations) throws Exception {
         this.destinations = new AudioDir[destinations.length];
@@ -15,18 +14,8 @@ public class Session {
         }
     }
 
-    public void setSources(String[] sources) throws Exception {
-        this.sources = new AudioDir[sources.length];
-        for (int i = 0; i < this.sources.length; i++) {
-            this.sources[i] = new AudioDir(sources[i]);
-        }
-    }
-
     public AudioDir[] getDestinations() {
-        return destinations;
+        return new String[]{"C:\\temp\\test_dest"};
     }
 
-    public AudioDir[] getSources() {
-        return sources;
-    }
 }
