@@ -7,9 +7,10 @@ public class FS {
 
     private Path path;
 
-    public FS(Path path) throws Exception {
+    public FS(Path path) {
         if (Files.isDirectory(path)) this.path = path;
-        else throw new Exception("Specified path is not a directory");
+        // TODO Is it possible?
+//        else throw new Exception("Specified path is not a directory");
     }
 
 //    public File[] listDir() {

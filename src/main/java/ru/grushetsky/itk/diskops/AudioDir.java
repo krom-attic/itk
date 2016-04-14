@@ -11,7 +11,7 @@ public class AudioDir implements IDirLister {
     private ObjectProperty<Path> basedir;
     private ObjectProperty<FS> fs;
 
-    public AudioDir(String path) throws Exception {
+    public AudioDir(String path) {
         this.basedir = new SimpleObjectProperty<>(Paths.get(path));
         this.fs = new SimpleObjectProperty<>(new FS(this.basedir.getValue()));
     }

@@ -9,7 +9,7 @@ import javafx.scene.layout.AnchorPane;
 import ru.grushetsky.itk.MainApp;
 import ru.grushetsky.itk.config.Settings;
 import ru.grushetsky.itk.diskops.AudioDir;
-import ru.grushetsky.itk.main.Session;
+import ru.grushetsky.itk.session.Session;
 import ru.grushetsky.itk.scene.control.Directory;
 import ru.grushetsky.itk.scene.control.TreeViewWithItems;
 
@@ -55,7 +55,7 @@ public class SessionController {
     public void initTabs() {
         // TODO Must be run only once
         Session session = mainApp.getCurrentSession();
-        Settings settings = mainApp.getCurrentSettings();
+        Settings settings = mainApp.getSettings();
         for (AudioDir source : settings.getSources()) {
             Tab newTab = new Tab(source.getShortName());
             TreeViewWithItems<Directory> newSourceTree = buildSourceTree(source);

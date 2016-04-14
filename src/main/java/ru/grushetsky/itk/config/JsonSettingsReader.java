@@ -6,23 +6,22 @@ import java.io.IOException;
 
 public class JsonSettingsReader implements ISettingsReader {
     final static ObjectMapper MAPPER = new ObjectMapper();
+    String settingsJson;
 
-    public JsonSettingsReader(String JsonString) {
-
+    public JsonSettingsReader(String jsonString) {
+        this.settingsJson = jsonString;
     }
 
     @Override
-    public Settings readSettings(String sessionJson) {
+    public Settings readSettings() {
         Settings settings;
-        // Инициализировать объект конфига
         try {
-            settings = MAPPER.readValue(sessionJson, Settings.class);
+            settings = MAPPER.readValue(settingsJson, Settings.class);
         } catch (IOException e) {
             // TODO Throw an exception!
             e.printStackTrace();
             settings = null;
         }
-
         return settings;
     }
 }
