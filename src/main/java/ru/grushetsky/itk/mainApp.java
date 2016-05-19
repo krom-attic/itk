@@ -6,10 +6,9 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import ru.grushetsky.itk.config.SessionManager;
-import ru.grushetsky.itk.config.SessionConfig;
-import ru.grushetsky.itk.config.Settings;
-import ru.grushetsky.itk.main.Session;
+import ru.grushetsky.itk.config.*;
+import ru.grushetsky.itk.session.Session;
+import ru.grushetsky.itk.session.SessionManager;
 import ru.grushetsky.itk.view.SessionController;
 
 import java.io.IOException;
@@ -19,7 +18,8 @@ public class MainApp extends Application {
     private Stage primaryStage;
     private BorderPane rootLayout;
     private Session currentSession;
-    private Settings currentSettings;
+    private Settings settings;
+    private SessionManager sessionManager = SessionManager.getInstance();
 
     public MainApp() {
 
@@ -32,11 +32,11 @@ public class MainApp extends Application {
 
         initRootLayout();
 
-        currentSettings = Settings.getInstance();
+        String testSettingsJson = "{\"sources\": [\"C:\\\\test\\\\audiobooks\\\\\", \"C:\\\\test\\\\music\\\\\", \"C:\\\\test\\\\podcasts\\\\\"], \"lastSessionId\": \"test\"}";
+        loadSettings(new JsonSettingsReader(testSettingsJson));
+//        loadSettings(new JsonSettingsReader(StringFileReader.readJsonByName("settings")));
 
-        SessionManager sessionManager = SessionManager.getInstance();
-        SessionConfig sessionConfig = sessionManager.getSessionConfig(currentSettings.getLastSessionId());
-        currentSession = new Session(this, sessionConfig);
+        loadSession(settings.getLastSessionId());
 
         showSessionPane();
     }
@@ -84,7 +84,15 @@ public class MainApp extends Application {
         return currentSession;
     }
 
-    public Settings getCurrentSettings() {
-        return currentSettings;
+    public Settings getSettings() {
+        return settings;
+    }
+
+    public void loadSettings(ISettingsReader settingsReader) {
+        this.settings = settingsReader.readSettings();
+    }
+
+    public void loadSession(String sessionId) {
+        this.currentSession = sessionManager.getSession(sessionId);
     }
 }

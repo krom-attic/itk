@@ -1,14 +1,19 @@
 package ru.grushetsky.itk.view;
 
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.util.Callback;
 import ru.grushetsky.itk.MainApp;
 import ru.grushetsky.itk.config.Settings;
 import ru.grushetsky.itk.diskops.AudioDir;
+import ru.grushetsky.itk.scene.control.ObjectTreeCell;
 import ru.grushetsky.itk.session.Session;
 import ru.grushetsky.itk.scene.control.Directory;
 import ru.grushetsky.itk.scene.control.TreeViewWithItems;
@@ -17,6 +22,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class SessionController {
     private MainApp mainApp;
@@ -73,10 +80,12 @@ public class SessionController {
             sourceTrees.get(0).setVisible(true);
         }
 
-        sourceTabPane.getSelectionModel().selectedIndexProperty().addListener((ov, oldValue, newValue) -> {
+        ChangeListener<Number> switchVisibleTrees = (ov, oldValue, newValue) -> {
             sourceTrees.get(oldValue.intValue()).setVisible(false);
             sourceTrees.get(newValue.intValue()).setVisible(true);
-        });
+        };
+
+        sourceTabPane.getSelectionModel().selectedIndexProperty().addListener(switchVisibleTrees);
     }
 
     private TreeViewWithItems<Directory> buildSourceTree(AudioDir source) {
@@ -84,29 +93,25 @@ public class SessionController {
         TreeViewWithItems<Directory> sourceTree = new TreeViewWithItems<>(new TreeItem<>(new Directory()));
         sourceTree.getRoot().setExpanded(true);
         sourceTree.setShowRoot(false);
-        sourceTree.setCellFactory(tree -> {
-            TreeCell<Directory> treeCell = new TreeCell<Directory>() {
-                @Override
-                public void updateItem(Directory item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setTreeCellText(item, empty);
-                }
 
-                private void setTreeCellText(Directory item, boolean empty) {
-                    if (empty) {
-                        setText(null);
-                    } else {
-                        setText(item.toString());
+        Callback<TreeView<Directory>, TreeCell<Directory>> dirCellFactory = tree -> {
+            TreeCell<Directory> treeCell = new ObjectTreeCell<>();
+
+            Function<ObjectTreeCell<Directory>, EventHandler<MouseEvent>> handlerProducer = cell -> {
+                return event -> {
+                    if (event.getButton() == MouseButton.SECONDARY) {
+                        // TODO Here we have to get object that we're going to change (not testLabel)
+                        testLabel.setText(cell.getTreeItem().getValue().getName());
                     }
-                }
+                };
             };
-            treeCell.setOnMouseClicked(event -> {
-                if (event.getButton() == MouseButton.SECONDARY) {
-                    testLabel.setText(treeCell.getTreeItem().getValue().getName());
-                }
-            });
+
+
+            treeCell.setOnMouseClicked(handlerProducer(treeCell));  // TODO что ему не нравится?
             return treeCell;
-        });
+        };
+
+        sourceTree.setCellFactory(dirCellFactory);
         Path rootPath = source.getBasedir();
         Directory rootDir = new Directory(rootPath);
         directories.add(rootDir);
